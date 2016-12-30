@@ -19,17 +19,28 @@ class DomainCommand extends Command
         $this
             ->setName('app:find-domains')
             ->setDescription('Find Domain in a web page')
-            ->addArgument('url', InputArgument::REQUIRED, 'Url to start finding')
+            ->addArgument('query', InputArgument::REQUIRED, 'Query start finding')
             ->addOption('deep', 'd', InputOption::VALUE_REQUIRED, 'How deep do you want go?', 1);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $url = $input->getArgument('url');
+        $query = $input->getArgument('query');
+        $query = urlencode($query);
+        $url = 'https://www.google.es/search?q='.$query.'&num=100&pws=0&hl=es';
+
         $this->deep = $input->getOption('deep');
         $this->output = $output;
 
-        $this->finder($url);
+        $dFinder = new DomainFinder();
+        $urls = $dFinder->find($url);
+        foreach ($urls as $key => $nUrl) {
+            if (preg_match('/^\/url\?\q=([^&]+)/', $nUrl, $res)) {
+                $this->finder($res[1]);
+                $output->writeln($res[1]);
+            }
+
+        }
     }
 
     protected function finder($url, $currentDeep = 1)
