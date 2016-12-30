@@ -1,0 +1,10 @@
+{
+    "require": {
+        "symfony/console": "^3.2",
+        "fabpot/goutte": "^3.2",
+        "phpunit/phpunit": "5.5.*"
+    },
+    "autoload": {
+        "psr-4": {"AppBundle\\": "src/"}
+    }
+}
