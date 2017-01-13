@@ -37,6 +37,9 @@ class UrlTest extends TestCase
 
     public function testgetDomain()
     {
+        $x = Url::getDomain('http://PRUeba.com');
+        $this->assertEquals('http://prueba.com', $x);
+
         $x = Url::getDomain('http://prueba.com');
         $this->assertEquals('http://prueba.com', $x);
 

@@ -2,7 +2,8 @@
 
 namespace AppBundle\Util;
 
-class Url {
+class Url
+{
     public static function urlize($base, $path)
     {
         // remove anchors
@@ -16,24 +17,20 @@ class Url {
 
         // if is a new url
         if (preg_match('/^http(s)*\:\/\//', $base)) {
-
             return $base;
         }
 
-        // if it is not a url 
+        // if it is not a url
         if (!preg_match('/^http(s)*\:\/\//', $path)) {
-
             return '';
         }
 
-        // ignore mailto: tel: fax: 
+        // ignore mailto: tel: fax:
         if (preg_match('/^[a-z]+\:/i', $base)) {
-
             return '';
         }
 
-        if (preg_match('/^\//', $base)) { 
-
+        if (preg_match('/^\//', $base)) {
             return $pathBase.$base;
         } else {
             if (!preg_match('/\/$/', $path)) {
@@ -54,6 +51,6 @@ class Url {
             $url = false;
         }
 
-        return $url;
+        return strtolower($url);
     }
 }

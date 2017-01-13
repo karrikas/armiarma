@@ -39,7 +39,6 @@ class DomainCommand extends Command
                 $this->finder($res[1]);
                 $output->writeln($res[1]);
             }
-
         }
     }
 
@@ -73,7 +72,7 @@ class DomainCommand extends Command
 
             if (!in_array($domain, $this->domains)) {
                 $this->domains[] = $domain;
-                file_put_contents(ROOTDIR.'/var/domains.txt', $domain."\n", FILE_APPEND | LOCK_EX);
+                $this->saveDomain($domain);
             }
 
             if (!in_array($return, $this->urls)) {
@@ -81,6 +80,16 @@ class DomainCommand extends Command
             }
 
             $this->finder($return, $currentDeep+1);
+        }
+    }
+
+    protected function saveDomain($domain)
+    {
+        $path = ROOTDIR.'/var/domains.txt';
+        $domains = file_get_contents($path);
+        $escDomain = preg_quote($domain, '/');
+        if (!preg_match_all("/$escDomain/", $domains)) {
+            file_put_contents($path, $domain."\n", FILE_APPEND | LOCK_EX);
         }
     }
 }
