@@ -7,6 +7,35 @@ class UrlTest extends TestCase
 {
     public function testUrlize()
     {
+        $a = 'android-app://org.wikipedia/http/eu.m.wikipedia.org/wiki/HTML';
+        $b = 'http://org.wikipedia';
+        $x = Url::urlize($a, $b);
+        $this->assertEquals('', $x);
+
+        $a = '/w/index.php?title=HTML&amp;action=edit';
+        $b = 'http://org.wikipedia/w/';
+        $x = Url::urlize($a, $b);
+        $this->assertEquals('http://org.wikipedia/w/index.php?title=HTML&action=edit', $x);
+
+
+        $a = '/static/apple-touch/wikipedia.png';
+        $b = 'http://org.wikipedia/w/';
+        $x = Url::urlize($a, $b);
+        $this->assertEquals('http://org.wikipedia/static/apple-touch/wikipedia.png', $x);
+
+        $a = '//eu.wikipedia.org/w/api.php?action=rsd';
+        $b = 'http://org.wikipedia/w/';
+        $x = Url::urlize($a, $b);
+        $this->assertEquals('http://eu.wikipedia.org/w/api.php?action=rsd', $x);
+
+        $a = 'https://eu.wikipedia.org/wiki/HTML';
+        $b = 'http://org.wikipedia/w/';
+        $x = Url::urlize($a, $b);
+        $this->assertEquals('https://eu.wikipedia.org/wiki/HTML', $x);
+
+        $x = Url::urlize('http://www.woothemes.com', 'http://lupulu.com');
+        $this->assertEquals('http://www.woothemes.com', $x);
+        
         $x = Url::urlize('a', 'b');
         $this->assertEquals('', $x);
         

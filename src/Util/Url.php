@@ -4,11 +4,33 @@ namespace AppBundle\Util;
 
 class Url
 {
+    /**
+     * Get the aboslute url path with domain name.
+     * @param string $base path to find
+     * @param string $path current page
+     *
+     * @return string absolute url
+     */
     public static function urlize($base, $path)
     {
         // remove anchors
         $base = preg_replace('/#.*$/', '', $base);
         $path = preg_replace('/#.*$/', '', $path);
+        $base = html_entity_decode($base);
+        $path = html_entity_decode($path);
+
+        // allowed protocols http, https
+        $protocols = ['http', 'https'];
+        if (preg_match('@([^:]+)://@', $base, $res)) {
+            if (!in_array($res[1], $protocols)) {
+                return '';
+            }
+        }
+
+        // without protocol add http
+        if (preg_match('@^//@', $base, $res)) {
+            $base = 'http:'.$base;
+        }
 
         // find de url root "http://domain.com"/xxx/bbb
         if (preg_match('/(^[^\:]+\:\/\/[^\/]+)/', $path, $res)) {
@@ -43,6 +65,12 @@ class Url
         return '';
     }
 
+    /**
+     * get domain name with protocol.
+     * @param string $url
+     *
+     * @return string|false
+     */
     public static function getDomain($url)
     {
         if (preg_match('/http(s)*\:\/\/[^\/]+/', $url, $res)) {

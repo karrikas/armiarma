@@ -2,7 +2,8 @@
     "require": {
         "symfony/console": "^3.2",
         "fabpot/goutte": "^3.2",
-        "phpunit/phpunit": "5.5.*"
+        "phpunit/phpunit": "5.5.*",
+        "tedivm/stash": "^0.14.1"
     },
     "autoload": {
         "psr-4": {"AppBundle\\": "src/"}

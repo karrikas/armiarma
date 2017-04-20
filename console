@@ -4,10 +4,12 @@ require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use AppBundle\Command\DomainCommand;
+use AppBundle\Command\CrawlerCommand;
 
 const ROOTDIR = __DIR__;
 
 $application = new Application();
 $application->add(new DomainCommand());
+$application->add(new CrawlerCommand());
 
 $application->run();

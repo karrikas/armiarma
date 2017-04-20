@@ -53,7 +53,7 @@ class DomainCommand extends Command
         }
 
         $this->output->writeln('download: '.$url.' deep: '.$currentDeep);
-        file_put_contents(ROOTDIR.'/var/urls.txt', $url."\n",  FILE_APPEND | LOCK_EX);
+        file_put_contents(ROOTDIR.'/var/urls.txt', $url."\n", FILE_APPEND | LOCK_EX);
 
         $dFinder = new DomainFinder();
         $urls = $dFinder->find($url);
