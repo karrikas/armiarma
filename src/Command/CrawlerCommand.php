@@ -18,7 +18,10 @@ class CrawlerCommand extends Command
 {
     private $urls = [];
     private $visitedUrls = [];
+    private $externalUrls = [];
     private $domainError = [];
+
+    private $timeout = 30;
 
     protected function configure()
     {
@@ -33,7 +36,7 @@ class CrawlerCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $driver = new FileSystem(array('path' => __DIR__.'/../../var/cache/'));
         $cache = new Pool($driver);
-        $client = new guzzleclient(array('timeout' => 60));
+        $client = new guzzleclient(array('timeout' => $this->timeout));
 
         $url = $input->getArgument('url');
         $domain = Url::getDomain($url);
@@ -66,7 +69,7 @@ class CrawlerCommand extends Command
                 continue;
             }
 
-            //$io->note("crawl: $currentUrl status: ".$status);
+            $io->note("crawl: $currentUrl status: ".$status);
             $urls = Html::findUrls($data);
 
             foreach ($urls as $url) {
@@ -74,18 +77,24 @@ class CrawlerCommand extends Command
 
                 if ($this->isExternal($url, $domain)) {
                     $externalDomain = Url::getDomain($url);
-                    if (!$this->saveUrl($externalDomain)) {
+                    if (empty(trim($externalDomain))) {
+                        continue;
+                    }
+
+                    if (!$this->saveExternalUrl($externalDomain)) {
                         continue;
                     }
                     try {
                         $res = $client->request('GET', $externalDomain);
                         $status = $res->getStatusCode();
                         if ($status >= 400) {
-                            $io->text($externalDomain);
+                            $io->text($externalDomain.' > '.$currentUrl);
+                            $this->save2file('errorDomain.txt', $externalDomain.' > '.$currentUrl);
                             $this->domainError[] = $externalDomain;
                         }
                     } catch (\Exception $e) {
-                        $io->text($externalDomain);
+                        $io->text($externalDomain.' > '.$currentUrl);
+                        $this->save2file('errorDomain.txt', $externalDomain.' > '.$currentUrl);
                         $this->domainError[] = $externalDomain;
                     }
 
@@ -94,6 +103,30 @@ class CrawlerCommand extends Command
                 $this->saveUrl($url);
             }
         }
+    }
+
+    protected function save2file($file, $url)
+    {
+        $path = __DIR__.'/../../var/'.$file;
+
+        $info = file_get_contents($path);
+        $urls = explode(" > ", $url);
+        if (strpos($info, $urls[0]." >") !== false) {
+            return false;
+        }
+
+        file_put_contents($path, $url."\n", FILE_APPEND | LOCK_EX);
+    }
+
+    protected function saveExternalUrl($url)
+    {
+        if (in_array($url, $this->externalUrls)) {
+            return false;
+        }
+
+        $this->externalUrls[] = $url;
+
+        return true;
     }
 
     protected function saveUrl($url)
